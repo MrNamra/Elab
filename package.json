@@ -1,0 +1,19 @@
+{
+  "name": "elab",
+  "version": "2.0.0",
+  "description": "Elab For SRKI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/MrNamra/Elab.git"
+  },
+  "author": "Namra Ramsha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrNamra/Elab/issues"
+  },
+  "homepage": "https://github.com/MrNamra/Elab#readme"
+}
