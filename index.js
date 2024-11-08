@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 app.set('view engine', 'ejs')
 app.set('views', './views');
+const stu = require('./models/Students')
 
 const PORT = process.env.PORT || 3001
 

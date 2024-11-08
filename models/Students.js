@@ -1,8 +1,7 @@
-const { name } = require("ejs")
 const { Schema, mongo, default: mongoose } = require("mongoose")
 
 const StudnetsSchema = new Schema({
-    em_no: {
+    en_no: {
         type: String,
         required: true,
         null: false,
@@ -31,15 +30,10 @@ const StudnetsSchema = new Schema({
         type: String,
         required: true,
         null: false
-    },
-    CreatedAt: {
-        type: Date,
-        default: Date.now
-    },
-    UpdatedAt: {
-        type: Date,
-        default: Date.now
     }
+},
+{
+    timestamps: true
 })
 
 module.exports = mongoose.model('Student', StudnetsSchema)
