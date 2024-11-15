@@ -9,7 +9,8 @@ const AdminSchema = new Schema({
     email: {
         type: String,
         required: true,
-        null: false
+        null: false,
+        unique: true
     },
     password: {
         type: String,
@@ -17,10 +18,11 @@ const AdminSchema = new Schema({
         null: false
     },
     role:{
-        type: int,
+        type: Number,
         required: true,
         default: 1
-    }
+    },
+    ucode: String
 },
 {
     timestamps: true
