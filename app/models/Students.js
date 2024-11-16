@@ -1,39 +1,43 @@
-const { Schema, mongo, default: mongoose } = require("mongoose")
+const mongoose = require('mongoose');
 
-const StudnetsSchema = new Schema({
+const studentSchema = new mongoose.Schema({
     en_no: {
         type: String,
-        required: true,
-        null: false,
-        unique: true,        
+        required: [true, 'Enrollment number is required'],
+        unique: true,
+        trim: true
     },
     name: {
         type: String,
-        required: true,
-        null: false,
+        required: [true, 'Name is required'],
+        trim: true
     },
-
-    ip: String,
-
-    course_id:{
+    ip: {
+        type: String,
+        unique: false,
+        sparse: true,
+        trim: true
+    },
+    course_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
-        required: true,
+        required: [true, 'Course ID is required']
     },
-    sem:{
-        type: Number,
-        required: true,
-        null: false,
-        max: 10
+    sem: {
+        type: String,
+        required: [true, 'Semester is required'],
+        trim: true
     },
     div: {
         type: String,
-        required: true,
-        null: false
+        required: [true, 'Division is required'],
+        trim: true
     }
-},
-{
+}, {
     timestamps: true
-})
+});
 
-module.exports = mongoose.model('Student', StudnetsSchema)
+// Create index for enrollment number
+studentSchema.index({ en_no: 1 }, { unique: true });
+
+module.exports = mongoose.model('Student', studentSchema);

@@ -2,8 +2,12 @@ require('dotenv').config();
 const helper = require("../helpers/helper");
 const crypto = require('crypto');
 var jwt = require('jsonwebtoken');
-const Admin = require("../models/Admin");
 const bcrypt = require('bcrypt');
+// models
+const Admin = require("../models/Admin");
+const Course = require("../models/Course");
+const Subject = require("../models/Subject");
+const Student = require("../models/Students");
 
 module.exports = {
     register: async (req, res) => {
@@ -22,7 +26,7 @@ module.exports = {
                 res.status(400).send({ message: 'Duplicate entry, email already exists.' });
             } else {
                 console.log(err);
-                res.status(500).send('An error occurred');
+                res.status(500).send({ message: 'An error occurred' });
             }
         }
     },
@@ -44,9 +48,21 @@ module.exports = {
             const token = jwt.sign({ id: admin.ucode }, process.env.JWT_SECRET, { expiresIn: '1h' });
             res.status(200).send({ message: "Login Successful!", token: token });
         } catch (err){
-            helper.errorLog(err, 'AdminService/login');
-            console.log(err);
-            res.status(500).send({ message: 'An error occurred' });
+            const errorResponse = helper.errorLog(err, 'AdminService/login');
+            res.status(500).send({ errorResponse });
         }
-    }
+    },
+    index: async (req, res) => {
+        try{
+            const [courseCount, subjectCount, studentCount] = await Promise.all([
+                    Course.countDocuments(),
+                    Subject.countDocuments(),
+                    Student.countDocuments()
+                ]);
+            res.status(200).json({ courseCount, subjectCount, studentCount });
+        } catch(err) {
+            const errorResponse = helper.errorLog(err, 'AdminService/index');
+            res.status(500).send({ errorResponse });
+        }
+    },
 }

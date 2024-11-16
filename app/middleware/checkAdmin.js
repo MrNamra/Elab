@@ -23,9 +23,8 @@ module.exports = {
             req.admin = admin;
             next();
         } catch(err) {
-            helper.errorLog(err, 'middleware/checkAdmin');
-            console.log(err);
-            return res.status(404).json({ message: 'Invalid Identity or session expired.' });
+            const errorResponse = helper.errorLog(err, 'middleware/checkAdmin');
+            res.status(500).send({ errorResponse });
         }
     }
 }

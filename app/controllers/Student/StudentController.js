@@ -1,5 +1,5 @@
-const helper = require('../helpers/helper');
-const Student = require('../models/Students');
+const helper = require('../../helpers/helper');
+const Student = require('../../models/Students');
 
 module.exports = {
     // Student login
@@ -21,8 +21,8 @@ module.exports = {
             // If IP matches, proceed with password authentication
             passport.authenticate('local', (err, student, info) => {
                 if (err) {
-                    helper.errorLog(err, 'StudentController/login');
-                    return res.status(500).send('An error occurred');
+                    const errorResponse = helper.errorLog(err, 'StudentController/login');
+                    return res.status(500).send({ errorResponse });
                 }
 
                 if (!student) {
@@ -39,8 +39,8 @@ module.exports = {
                 });
             })(req, res); // Call Passport authenticate
         } catch (err) {
-            helper.errorLog(err, 'StudentController/login');
-            res.status(500).send('An error occurred');
+            const errorResponse = helper.errorLog(err, 'StudentController/login');
+            res.status(500).send({ errorResponse });
         }
     }
 };
