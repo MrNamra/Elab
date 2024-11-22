@@ -20,5 +20,8 @@ router.put("/edit-student", StudentController.editStudent);
 router.post("/add-student", StudentController.addStudent);
 router.post("/promoteDemoteStudents", StudentController.promoteDemoteStudents);
 
-router.post("/schedule-lab", )
+// store subject Unit data routes
+router.post("/add-subject-data", SubjectController.addSubjectData);
+
+// router.post("/schedule-lab", )
 module.exports = router

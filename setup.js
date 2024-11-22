@@ -4,7 +4,8 @@ const path = require('path');
 // Create required directories
 const dirs = [
     path.join(__dirname, 'public/uploads', 'temp'),
-    path.join(__dirname, 'logs')
+    path.join(__dirname, 'logs'),
+    path.join(__dirname, 'public/uploads/temp', 'subjects'),
 ];
 
 dirs.forEach(dir => {

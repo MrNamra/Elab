@@ -26,5 +26,13 @@ module.exports = {
             const errorResponse = helper.errorLog(err, 'SubjectController/updateSubject');
             res.status(400).send({ errorResponse });
         }
+    },
+    addSubjectData: async (req, res) => {
+        try {
+            await subjectService.addSubjectData(req, res);
+        } catch (err) {
+            const errorResponse = helper.errorLog(err, 'SubjectController/addSubjectData');
+            res.status(400).send({ errorResponse });
+        }
     }
 }
