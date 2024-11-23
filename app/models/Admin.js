@@ -26,6 +26,7 @@ const AdminSchema = new Schema(
         ucode: {
             type: String,
             default: null,
+            null: true
         },
         ucodeUpdatedAt: {
             type: Date,
