@@ -7,11 +7,17 @@ const AdminController = require('./app/controllers/Admin/AdminController');
 const StudentController = require('./app/controllers/Student/StudentController');
 const studentsRoutes = require('./app/routes/students');
 const AdminRoutes = require('./app/routes/admins');
+const { accessLogger } = require('./app/middleware/accessLogger');
+
+// Apply middlewares
+// app.use(responseTime);
+app.use(accessLogger);
+const { adminMiddleware } = require('./app/middleware/checkAdmin');
+const studentMiddleware = require('./app/middleware/checkStudent');
 
 // Body parser
 const bodyParser = require('body-parser');
-const { adminMiddleware } = require('./app/middleware/checkAdmin');
-const studentMiddleware = require('./app/middleware/checkStudent');
+
 
 app.use(bodyParser.json());
 

@@ -4,7 +4,6 @@ const Course = require("../models/Course");
 const csv = require('csv-parser');
 const fs = require('fs');
 const mongoose = require('mongoose');
-const { addStudents } = require("../controllers/Admin/StudentController");
 
 module.exports = {
     addStudents: async (req, res) => {

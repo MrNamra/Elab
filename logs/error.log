@@ -1,7 +1,0 @@
-[AdminService/register] 2024-11-15T18:05:10.485Z - E11000 duplicate key error collection: elab.admins index: email_1 dup key: { email: "test@test.com" }
-[AdminService/register] 2024-11-15T18:12:08.457Z - bcrypt is not defined
-[AdminService/login] 2024-11-15T18:16:21.522Z - Unknown encoding: hax
-[AdminService/login] 2024-11-15T18:16:39.746Z - Unknown encoding: hax
-[AdminService/login] 2024-11-15T18:16:57.554Z - secretOrPrivateKey must have a value
-[AdminService/login] 2024-11-15T18:17:25.564Z - secretOrPrivateKey must have a value
-[AdminService/login] 2024-11-15T18:18:02.426Z - secretOrPrivateKey must have a value
