@@ -32,14 +32,29 @@ module.exports = {
     },
     login: async (req, res) => {
         try{
+            const { trackFailedAttempt, getFailedAttempts } = require('../middleware/rateLimiter');
+            const MAX_FAILED_ATTEMPTS = 5;
+            
+            // Check failed attempts
+            const failedAttempts = getFailedAttempts(req.ip);
+            if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+                return res.status(429).json({ 
+                    message: 'Account temporarily locked. Please try again after 15 minutes.' 
+                });
+            }
+
             const admin = await Admin.findOne({ email: req.body.email });
             if (!admin) {
+                trackFailedAttempt(req.ip);
                 return res.status(401).send({ message : 'Invalid email or password'});
             }
+
             const isMatch = await bcrypt.compare(req.body.password, admin.password);
             if (!isMatch) {
+                trackFailedAttempt(req.ip);
                 return res.status(401).send({ message : 'Invalid email or password'});
             }
+
             const ucode = crypto.randomBytes(16).toString('hex')
             admin.ucode = ucode;
 
