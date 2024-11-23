@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
+const subjectdatas = require("../models/SubjectData");
 
 module.exports = {
     addSubject: async (req, res) => {
@@ -55,142 +56,148 @@ module.exports = {
         }
     },
     addSubjectData: async (req, res) => {
+        let uploadedFilePath = null;
+
         return new Promise((resolve, reject) => {
             // Always use multer to parse form data first
             upload(req, res, async function (err) {
-                console.log('Request body after multer:', req.body);
-                
                 try {
+                    // Store file path if file was uploaded
+                    if (req.file) {
+                        uploadedFilePath = req.file.path;
+                    }
+
                     // Handle multer errors
                     if (err instanceof multer.MulterError) {
-                        reject({ status: 400, message: 'File upload error: ' + err.message });
-                        return;
+                        throw { status: 400, message: 'File upload error: ' + err.message };
                     } else if (err) {
-                        reject({ status: 400, message: err.message });
-                        return;
+                        throw { status: 400, message: err.message };
                     }
 
                     // Check if this is a text-only update
                     if (req.body.text && !req.file) {
-                        console.log('Processing text-only update');
                         const updateData = {
                             sub_id: req.body.sub_id,
                             title: req.body.title,
                             data: req.body.text
                         };
 
-                        try {
-                            // If id is provided, update existing document
-                            if (req.body.id) {
-                                await SubjectData.findByIdAndUpdate(
-                                    req.body.id,
-                                    updateData,
-                                    { 
-                                        new: true,
-                                        runValidators: true
-                                    }
-                                );
-                                res.status(200).json({ 
-                                    message: 'Subject data updated successfully!'
-                                });
-                            } else {
-                                // Create new document if no id provided
-                                await SubjectData.create(updateData);
-                                res.status(201).json({ 
-                                    message: 'Subject data created successfully!'
-                                });
-                            }
-                            resolve();
-                        } catch (error) {
-                            console.error("Error processing text update:", error);
-                            if (error.name === 'ValidationError') {
-                                return res.status(400).json({
-                                    message: 'Validation Error',
-                                    errors: error.errors
-                                });
-                            }
-                            reject(error);
+                        // If id is provided, update existing document
+                        if (req.body.id) {
+                            await SubjectData.findByIdAndUpdate(
+                                req.body.id,
+                                updateData,
+                                { 
+                                    new: true,
+                                    runValidators: true
+                                }
+                            );
+                            res.status(200).json({ 
+                                message: 'Subject data updated successfully!'
+                            });
+                        } else {
+                            // Create new document if no id provided
+                            await SubjectData.create(updateData);
+                            res.status(201).json({ 
+                                message: 'Subject data created successfully!'
+                            });
                         }
+                        resolve();
                     } 
                     // Handle file upload case
                     else if (req.file) {
-                        console.log('Processing file upload');
                         // Validate required fields
                         if (!req.body.sub_id || !req.body.title) {
-                            return res.status(400).json({ 
+                            throw {
+                                status: 400,
                                 message: 'Missing required fields',
-                                required: {
-                                    sub_id: 'Subject ID is required',
-                                    title: 'Title is required'
-                                },
-                                received: req.body
+                                details: {
+                                    required: {
+                                        sub_id: 'Subject ID is required',
+                                        title: 'Title is required'
+                                    },
+                                    received: req.body
+                                }
+                            };
+                        }
+
+                        // Read file content
+                        const fileBuffer = fs.readFileSync(uploadedFilePath);
+                        
+                        // Extract text based on file type
+                        const extractedText = await extractText(fileBuffer, req.file.mimetype);
+
+                        const updateData = {
+                            sub_id: req.body.sub_id,
+                            title: req.body.title,
+                            data: extractedText
+                        };
+
+                        // Update if id provided, create if not
+                        if (req.body.id) {
+                            await SubjectData.findByIdAndUpdate(
+                                req.body.id,
+                                updateData,
+                                { 
+                                    new: true,
+                                    runValidators: true
+                                }
+                            );
+                            res.status(200).json({ 
+                                message: 'Subject data updated successfully!'
+                            });
+                        } else {
+                            await SubjectData.create(updateData);
+                            res.status(201).json({ 
+                                message: 'Subject data created successfully!'
                             });
                         }
-
-                        try {
-                            // Read file content
-                            const fileBuffer = fs.readFileSync(req.file.path);
-                            
-                            // Extract text based on file type
-                            const extractedText = await extractText(fileBuffer, req.file.mimetype);
-
-                            const updateData = {
-                                sub_id: req.body.sub_id,
-                                title: req.body.title,
-                                data: extractedText
-                            };
-
-                            // Update if id provided, create if not
-                            if (req.body.id) {
-                                await SubjectData.findByIdAndUpdate(
-                                    req.body.id,
-                                    updateData,
-                                    { 
-                                        new: true,
-                                        runValidators: true
-                                    }
-                                );
-                                res.status(200).json({ 
-                                    message: 'Subject data updated successfully!'
-                                });
-                            } else {
-                                await SubjectData.create(updateData);
-                                res.status(201).json({ 
-                                    message: 'Subject data created successfully!'
-                                });
-                            }
-
-                            // Clean up the temporary file
-                            if (fs.existsSync(req.file.path)) {
-                                fs.unlinkSync(req.file.path);
-                            }
-
-                            resolve();
-                        } catch (error) {
-                            console.error("Error processing file upload:", error);
-                            // Clean up the temporary file in case of error
-                            if (fs.existsSync(req.file.path)) {
-                                fs.unlinkSync(req.file.path);
-                            }
-                            if (error.name === 'ValidationError') {
-                                return res.status(400).json({
-                                    message: 'Validation Error',
-                                    errors: error.errors
-                                });
-                            }
-                            throw error;
-                        }
+                        resolve();
                     } else {
-                        return res.status(400).json({ 
+                        throw {
+                            status: 400,
                             message: 'Please provide either text content or a file'
+                        };
+                    }
+                } catch (error) {
+                    console.error("Error in addSubjectData:", error);
+                    // Send appropriate error response
+                    if (error.status) {
+                        res.status(error.status).json(error);
+                    } else if (error.name === 'ValidationError') {
+                        res.status(400).json({
+                            message: 'Validation Error',
+                            errors: error.errors
+                        });
+                    } else {
+                        res.status(500).json({
+                            message: 'Internal Server Error',
+                            error: error.message
                         });
                     }
-                } catch (err) {
-                    console.error("Error in addSubjectData:", err);
-                    reject(err);
+                    reject(error);
+                } finally {
+                    // Clean up uploaded file in all cases
+                    if (uploadedFilePath && fs.existsSync(uploadedFilePath)) {
+                        try {
+                            fs.unlinkSync(uploadedFilePath);
+                            console.log('Cleaned up file:', uploadedFilePath);
+                        } catch (cleanupError) {
+                            console.error('Error cleaning up file:', cleanupError);
+                        }
+                    }
                 }
             });
         });
+    },
+    getSubjectData: async (req, res) => {
+        try {
+            const subjectsData = await subjectdatas.find({},{_id: 1, title: 1})
+            res.status(200).json({ subjectsData });
+        } catch (err) {
+            const errorResponse = helper.errorLog(err, 'SubjectService/subjectService');
+            return res.status(400).send({ errorResponse });
+        }
     }
 }
 

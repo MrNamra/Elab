@@ -1,5 +1,6 @@
 const router = require("express")();
 const AdminController = require("../controllers/Admin/AdminController");
+const AiController = require("../controllers/Admin/AiController");
 const StudentController = require("../controllers/Admin/StudentController");
 const SubjectController = require("../controllers/Admin/SubjectController");
 
@@ -22,6 +23,7 @@ router.post("/promoteDemoteStudents", StudentController.promoteDemoteStudents);
 
 // store subject Unit data routes
 router.post("/add-subject-data", SubjectController.addSubjectData);
+router.get("/get-subject-data", SubjectController.getSubjectData);
+router.post("/genrateData", AiController.SendDataToAI);
 
-// router.post("/schedule-lab", )
 module.exports = router

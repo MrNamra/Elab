@@ -34,5 +34,14 @@ module.exports = {
             const errorResponse = helper.errorLog(err, 'SubjectController/addSubjectData');
             res.status(400).send({ errorResponse });
         }
+    },
+    getSubjectData: (req, res) => {
+        try {
+            subjectService.getSubjectData(req, res);
+            // res.status(200).send(data);
+        } catch(err) {
+            const errorResponse = helper.errorLog(err, 'SubjectController/getSubjectData');
+            res.status(400).send({ errorResponse });
+        }
     }
 }

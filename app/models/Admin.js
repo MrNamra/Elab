@@ -30,6 +30,7 @@ const AdminSchema = new Schema(
         ucodeUpdatedAt: {
             type: Date,
             default: null,
+            null: true
         },
     },
     {

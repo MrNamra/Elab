@@ -6,6 +6,7 @@ const dirs = [
     path.join(__dirname, 'public/uploads', 'temp'),
     path.join(__dirname, 'logs'),
     path.join(__dirname, 'public/uploads/temp', 'subjects'),
+    path.join(__dirname, 'public/uploads/', 'docx'),
 ];
 
 dirs.forEach(dir => {
