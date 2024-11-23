@@ -8,6 +8,7 @@ const StudentController = require('./app/controllers/Student/StudentController')
 const studentsRoutes = require('./app/routes/students');
 const AdminRoutes = require('./app/routes/admins');
 const { accessLogger } = require('./app/middleware/accessLogger');
+const { loginLimiter } = require('./app/middleware/rateLimiter');
 
 // Apply middlewares
 // app.use(responseTime);
@@ -18,7 +19,6 @@ const studentMiddleware = require('./app/middleware/checkStudent');
 // Body parser
 const bodyParser = require('body-parser');
 
-
 app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
@@ -27,7 +27,7 @@ if(process.env.ADMIN_REG == 'true'){
     app.post('/api/register', AdminController.register)
 }
 
-app.post('/api/admin/login', AdminController.login)
+app.post('/api/admin/login', loginLimiter, AdminController.login)
 
 // Routes
 app.use('/api/admins', adminMiddleware, AdminRoutes);
